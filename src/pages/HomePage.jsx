@@ -5,9 +5,12 @@ import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
 import playstore from "../assets/google-play-badge.png";
 import appstore from "../assets/app-store-badge.png";
 
+
 const HomePage = () => {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showMenu, setShowMenu] = useState(false);
+
 
   useEffect(() => {
     axios.get("http://localhost:8000/api/cars")
@@ -23,21 +26,50 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white">
-      
-      {/* Header */}
       <header className="bg-white shadow sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between p-4">
-          <span className="text-xl font-bold text-blue-700">CarWorld</span>
-          <nav className="space-x-6 hidden md:flex">
-            <Link to="/" className="text-gray-600 hover:text-blue-600">Home</Link>
-            <Link to="/about" className="text-gray-600 hover:text-blue-600">About</Link>
-            <Link to="/contact" className="text-gray-600 hover:text-blue-600">Contact</Link>
-            <a href="http://localhost:3000/" className="text-gray-600 hover:text-blue-600" target="_blank" rel="noopener noreferrer">
-              Admin
-            </a>
-          </nav>
-        </div>
-      </header>
+  <div className="max-w-7xl mx-auto flex items-center justify-between p-4">
+    <span className="text-xl font-bold text-blue-700">CarWorld</span>
+
+    {/* Mobile menu button */}
+    <button
+      onClick={() => setShowMenu(!showMenu)}
+      className="md:hidden text-gray-600 focus:outline-none"
+    >
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+
+    {/* Desktop nav */}
+    <nav className="space-x-6 hidden md:flex">
+      <Link to="/" className="text-gray-600 hover:text-blue-600">Home</Link>
+      <Link to="/about" className="text-gray-600 hover:text-blue-600">About</Link>
+      <Link to="/contact" className="text-gray-600 hover:text-blue-600">Contact</Link>
+      <a href="http://localhost:3000/" className="text-gray-600 hover:text-blue-600" target="_blank" rel="noopener noreferrer">
+        Admin
+      </a>
+    </nav>
+  </div>
+
+  {/* Mobile dropdown menu */}
+  {showMenu && (
+    <div className="md:hidden px-4 pb-4 space-y-2 bg-white shadow">
+      <Link to="/" className="block text-gray-700 hover:text-blue-600">Home</Link>
+      <Link to="/about" className="block text-gray-700 hover:text-blue-600">About</Link>
+      <Link to="/contact" className="block text-gray-700 hover:text-blue-600">Contact</Link>
+      <a href="http://localhost:3000/" className="block text-gray-700 hover:text-blue-600" target="_blank" rel="noopener noreferrer">
+        Admin
+      </a>
+    </div>
+  )}
+</header>
+
 
       {/* Main Car Grid */}
       <main className="flex-grow max-w-7xl mx-auto px-4 py-10">
@@ -53,13 +85,16 @@ const HomePage = () => {
           <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {cars.map((car) => (
               <div key={car.id} className="bg-white rounded-lg shadow p-4">
-                {car.image && (
-                  <img
-                    src={`http://localhost:8000/storage/${car.image}`}
-                    alt={car.name}
-                    className="w-full h-48 object-cover rounded"
-                  />
-                )}
+               <img
+  src={car.image_url || "/no-image.png"}
+  alt={car.name}
+  className="w-full h-48 object-cover rounded"
+  onError={(e) => {
+    e.target.onerror = null;
+    e.target.src = "/no-image.png";
+  }}
+/>
+
                 <h2 className="text-xl font-bold mt-4">{car.name}</h2>
                 <p className="text-gray-600 line-clamp-2">{car.description}</p>
                 <p className="text-blue-600 font-semibold mt-2">₹ {car.price}</p>
